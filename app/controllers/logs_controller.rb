@@ -23,8 +23,8 @@ class LogsController < ApplicationController
     while i < count
       title = titles[i].children[0].attributes['href'].value
       date = dates[i].children[0].attributes['href']
-      id_count = Log.count # make sure ids are always unique
-      logs << Log.new(id: i + id_count, title: title, date: date, content: content[i + 1]).save
+      id = Log.count + 1 # make sure ids are always unique
+      logs << Log.new(id: id, title: title, date: date, content: content[i + 1]).save
       # for the content we do i + 1 because we want to skip the first element
       # of i withoug mutating the content data.
       i = i + 1
