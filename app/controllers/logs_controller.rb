@@ -2,15 +2,15 @@ require 'open-uri'
 
 class LogsController < ApplicationController
   def index
-    get_logs
+    url = 'https://gist.github.com/latoyaallen/c585656a196dab73158d9ffcd0a26688'
+    create_logs_from(url)
     @logs = Log.all
     json_response(@logs)
   end
 
   private
 
-  def get_logs
-    url = 'https://gist.github.com/latoyaallen/c585656a196dab73158d9ffcd0a26688'
+  def create_logs_from(url)
     doc = Nokogiri::HTML.parse(open(url))
     titles = doc.xpath("//h2")
     dates = doc.xpath("//h3")
@@ -18,18 +18,25 @@ class LogsController < ApplicationController
 
     count = titles.size
     i = 0
-    logs = []
 
     while i < count
-      title = titles[i].children[0].attributes['href'].value
-      date = dates[i].children[0].attributes['href']
-      id = Log.count + 1 # make sure ids are always unique
-      logs << Log.new(id: id, title: title, date: date, content: content[i + 1]).save
-      # for the content we do i + 1 because we want to skip the first element
-      # of i withoug mutating the content data.
+      if Log.find_by_id(i).nil? # If the id exists, do nothing.  If no id, create a new Log obj.
+        Log.new(id: i, title: get_title(i, titles), date: get_dates(i, dates), content: get_content(i, content)).save
+      end
       i = i + 1
     end
-    logs
+  end
+
+  def get_title(i, titles)
+    titles[i].children[0].attributes['href'].value
+  end
+
+  def get_dates(i, dates)
+    dates[i].children[0].attributes['href']
+  end
+
+  def get_content(i, content)
+    content[i + 1]
   end
 
   def json_response(object, status = :ok)
