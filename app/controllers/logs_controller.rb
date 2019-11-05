@@ -2,7 +2,7 @@ require 'open-uri'
 
 class LogsController < ApplicationController
   def index
-    url = 'https://gist.github.com/latoyaallen/c585656a196dab73158d9ffcd0a26688'
+    url = 'https://gist.github.com/latoyaallen/61f4a63ae09e2405564f6294ae186e10'
     create_logs_from(url)
     @logs = Log.all
     json_response(@logs)
